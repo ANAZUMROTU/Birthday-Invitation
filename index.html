@@ -259,12 +259,10 @@
   }
 
   .btn-row{
-    position:relative;
     display:flex;
     justify-content:center;
     align-items:center;
     gap:18px;
-    height: 64px;
   }
 
   .btn{
@@ -274,6 +272,7 @@
     font-family:'Poppins', sans-serif;
     font-weight:600;
     font-size: 1rem;
+    line-height:1.2;
     cursor:pointer;
     box-shadow: 0 8px 16px rgba(0,0,0,0.12);
   }
@@ -281,7 +280,8 @@
   .btn-yes{
     background: var(--green-yes);
     color:white;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, background 0.15s ease;
+    z-index:2;
   }
   .btn-yes:hover{ background: var(--green-yes-dark); transform: scale(1.05); }
 
@@ -289,8 +289,14 @@
     background: white;
     color: var(--text-dark);
     border: 2px solid #f0c3d3;
-    position: absolute;
-    transition: left 0.18s ease, top 0.18s ease, transform 0.18s ease;
+    box-sizing: content-box; /* biar ukuran ga berubah waktu jadi fixed */
+    transition: left 0.18s ease, top 0.18s ease;
+    z-index:50;
+  }
+
+  .btn-no.roaming{
+    position: fixed;
+    margin:0;
   }
 
   .no-hint{
@@ -498,10 +504,11 @@ Love you infinity Sayanggg 🩷</p>
     document.getElementById('screen-final').classList.add('active');
   }
 
-  // evasive "No" button
+  // evasive "No" button — mulai di samping Yes, begitu disentuh kabur ke seluruh layar
   const noBtn = document.getElementById('noBtn');
-  const btnRow = document.getElementById('btnRow');
+  const yesBtn = document.querySelector('.btn-yes');
   const noHint = document.getElementById('noHint');
+  const EDGE_PAD = 16; // jarak minimal dari tepi layar
 
   const excuses = [
     "eh ketangkep dikit lagi~",
@@ -513,37 +520,67 @@ Love you infinity Sayanggg 🩷</p>
   ];
   let hintIndex = 0;
 
+  function activateRoaming(){
+    if(noBtn.classList.contains('roaming')) return;
+    const rect = noBtn.getBoundingClientRect();
+    // lock ukuran biar ga berubah pas pindah ke position:fixed
+    noBtn.style.width = rect.width + 'px';
+    noBtn.style.height = rect.height + 'px';
+    noBtn.style.left = rect.left + 'px';
+    noBtn.style.top = rect.top + 'px';
+    noBtn.classList.add('roaming');
+    // paksa reflow biar transisi dari posisi awal ke posisi baru kelihatan
+    noBtn.getBoundingClientRect();
+  }
+
   function moveNoBtn(){
-    const rowRect = btnRow.getBoundingClientRect();
-    const btnRect = noBtn.getBoundingClientRect();
-    const maxLeft = rowRect.width - btnRect.width;
-    const maxTop = rowRect.height - btnRect.height;
-    const newLeft = Math.max(0, Math.random()*maxLeft);
-    const newTop = Math.max(0, Math.random()*maxTop);
+    activateRoaming();
+
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+    const yesRect = yesBtn.getBoundingClientRect();
+
+    const maxLeft = Math.max(EDGE_PAD, window.innerWidth - btnW - EDGE_PAD);
+    const maxTop = Math.max(EDGE_PAD, window.innerHeight - btnH - EDGE_PAD);
+
+    // area terlarang di sekitar tombol Yes, biar No ga pernah numpuk di atasnya
+    const forbidden = {
+      left: yesRect.left - 28,
+      right: yesRect.right + 28,
+      top: yesRect.top - 28,
+      bottom: yesRect.bottom + 28
+    };
+
+    let newLeft, newTop, tries = 0;
+    do{
+      newLeft = EDGE_PAD + Math.random() * (maxLeft - EDGE_PAD);
+      newTop = EDGE_PAD + Math.random() * (maxTop - EDGE_PAD);
+      tries++;
+    } while(
+      tries < 20 &&
+      newLeft < forbidden.right && (newLeft + btnW) > forbidden.left &&
+      newTop < forbidden.bottom && (newTop + btnH) > forbidden.top
+    );
+
     noBtn.style.left = newLeft + 'px';
     noBtn.style.top = newTop + 'px';
     noHint.textContent = excuses[hintIndex % excuses.length];
     hintIndex++;
   }
 
-  // position initially inline next to Yes, then make it dodge
-  window.addEventListener('load', ()=>{
-    const rowRect = btnRow.getBoundingClientRect();
-    const yesBtn = document.querySelector('.btn-yes');
-    const yesRect = yesBtn.getBoundingClientRect();
-    noBtn.style.left = (yesRect.width + 18) + 'px';
-    noBtn.style.top = '0px';
-  });
-
   noBtn.addEventListener('mouseover', moveNoBtn);
   noBtn.addEventListener('click', (e)=>{ e.preventDefault(); moveNoBtn(); });
   noBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); moveNoBtn(); }, {passive:false});
-  btnRow.addEventListener('mousemove', (e)=>{
+  window.addEventListener('mousemove', (e)=>{
+    if(!noBtn.classList.contains('roaming')) return;
     const btnRect = noBtn.getBoundingClientRect();
     const dx = e.clientX - (btnRect.left + btnRect.width/2);
     const dy = e.clientY - (btnRect.top + btnRect.height/2);
     const dist = Math.sqrt(dx*dx + dy*dy);
-    if(dist < 70){ moveNoBtn(); }
+    if(dist < 80){ moveNoBtn(); }
+  });
+  window.addEventListener('resize', ()=>{
+    if(noBtn.classList.contains('roaming')) moveNoBtn();
   });
 </script>
 
