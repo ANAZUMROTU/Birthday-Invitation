@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Undangan Spesial Buat Sayang 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-bg-1: #ffd7e6;
+    --pink-bg-2: #ffc1d9;
+    --pink-envelope: #ff9fc6;
+    --pink-envelope-dark: #ff7fb3;
+    --red-heart: #e63950;
+    --red-heart-dark: #c2263c;
+    --cream-card: #fff6f8;
+    --text-dark: #5c3a42;
+    --gold: #ffc94d;
+    --green-yes: #6bbf8a;
+    --green-yes-dark: #4fa06f;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow-x:hidden;
+  }
+
+  body{
+    font-family:'Poppins', sans-serif;
+    background: linear-gradient(160deg, var(--pink-bg-1), var(--pink-bg-2));
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    color: var(--text-dark);
+    padding: 24px;
+  }
+
+  .display-font{
+    font-family:'Caveat', cursive;
+  }
+
+  /* floating hearts background */
+  .hearts-bg{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+  .heart-float{
+    position:absolute;
+    bottom:-10%;
+    font-size: 22px;
+    opacity:0.55;
+    animation: floatUp linear infinite;
+    color: var(--pink-envelope-dark);
+  }
+  @keyframes floatUp{
+    0%{ transform: translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.6; }
+    90%{ opacity:0.6; }
+    100%{ transform: translateY(-110vh) rotate(25deg); opacity:0; }
+  }
+
+  .stage{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width: 480px;
+  }
+
+  .screen{
+    display:none;
+    width:100%;
+    animation: fadeIn 0.6s ease;
+  }
+  .screen.active{ display:flex; flex-direction:column; align-items:center; }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  /* ---------- ENVELOPE SCREEN ---------- */
+  .envelope-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    text-align:center;
+  }
+
+  .envelope-wrap h1{
+    font-family:'Caveat', cursive;
+    font-size: 2.1rem;
+    margin: 0;
+    color: var(--red-heart-dark);
+  }
+
+  .envelope-wrap p.sub{
+    margin:0;
+    font-size:0.95rem;
+    color: var(--text-dark);
+    opacity:0.8;
+  }
+
+  .envelope{
+    position:relative;
+    width: 280px;
+    height: 190px;
+    cursor:pointer;
+    filter: drop-shadow(0 14px 20px rgba(230,57,80,0.25));
+    transition: transform 0.2s ease;
+  }
+  .envelope:hover{ transform: translateY(-4px); }
+  .envelope.opened{ pointer-events:none; }
+
+  .env-body{
+    position:absolute;
+    inset:0;
+    background: var(--pink-envelope);
+    border-radius: 12px;
+    overflow:hidden;
+  }
+  .env-body::before, .env-body::after{
+    content:"";
+    position:absolute;
+    top:0;
+    width:0;
+    height:0;
+    border-top: 95px solid var(--pink-envelope-dark);
+  }
+  .env-body::before{
+    left:0;
+    border-left: 140px solid transparent;
+  }
+  .env-body::after{
+    right:0;
+    border-right: 140px solid transparent;
+  }
+
+  .env-flap{
+    position:absolute;
+    top:0; left:0;
+    width:0; height:0;
+    border-left: 140px solid transparent;
+    border-right: 140px solid transparent;
+    border-top: 100px solid var(--pink-envelope);
+    transform-origin: top center;
+    transition: transform 0.6s ease;
+    z-index:3;
+  }
+  .envelope.opened .env-flap{
+    transform: rotateX(180deg);
+    z-index:1;
+  }
+
+  .env-letter{
+    position:absolute;
+    left:20px; right:20px;
+    top:40px;
+    height:120px;
+    background: var(--cream-card);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.7s ease 0.15s;
+    transform: translateY(0);
+    z-index:2;
+  }
+  .envelope.opened .env-letter{
+    transform: translateY(-46px);
+  }
+
+  .heart-seal{
+    position:absolute;
+    left:50%;
+    top: 78px;
+    transform: translate(-50%, 0);
+    width: 66px;
+    height: 66px;
+    z-index:4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .envelope.opened .heart-seal{ display:none; }
+
+  @keyframes pulse{
+    0%,100%{ transform: translate(-50%,0) scale(1); }
+    50%{ transform: translate(-50%,0) scale(1.08); }
+  }
+
+  .heart-seal svg{ width:100%; height:100%; filter: drop-shadow(0 3px 6px rgba(198,38,60,0.5)); }
+
+  .tap-hint{
+    font-size:0.8rem;
+    color: var(--red-heart-dark);
+    opacity:0.85;
+    margin-top: -4px;
+  }
+
+  /* ---------- LETTER / QUESTION SCREEN ---------- */
+  .card{
+    background: var(--cream-card);
+    border-radius: 22px;
+    padding: 32px 26px;
+    width:100%;
+    box-shadow: 0 16px 30px rgba(230,57,80,0.15);
+    text-align:center;
+    position:relative;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-14px; left:-14px; right:-14px; bottom:-14px;
+    border: 2px dashed rgba(255,127,179,0.4);
+    border-radius: 28px;
+    z-index:-1;
+  }
+
+  .to-line{
+    font-family:'Caveat', cursive;
+    font-size:1.6rem;
+    color: var(--red-heart-dark);
+    margin: 0 0 6px;
+  }
+
+  .message-text{
+    font-size:0.92rem;
+    line-height:1.65;
+    color: var(--text-dark);
+    text-align:left;
+    white-space:pre-line;
+    margin: 10px 0 18px;
+  }
+
+  .from-line{
+    font-family:'Caveat', cursive;
+    font-size:1.4rem;
+    color: var(--red-heart-dark);
+    text-align:right;
+    margin: 0 0 22px;
+  }
+
+  .question-title{
+    font-family:'Caveat', cursive;
+    font-size: 1.9rem;
+    color: var(--text-dark);
+    margin: 4px 0 20px;
+  }
+
+  .btn-row{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    height: 64px;
+  }
+
+  .btn{
+    border:none;
+    border-radius: 999px;
+    padding: 14px 30px;
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size: 1rem;
+    cursor:pointer;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+  }
+
+  .btn-yes{
+    background: var(--green-yes);
+    color:white;
+    transition: transform 0.15s ease;
+  }
+  .btn-yes:hover{ background: var(--green-yes-dark); transform: scale(1.05); }
+
+  .btn-no{
+    background: white;
+    color: var(--text-dark);
+    border: 2px solid #f0c3d3;
+    position: absolute;
+    transition: left 0.18s ease, top 0.18s ease, transform 0.18s ease;
+  }
+
+  .no-hint{
+    font-size:0.78rem;
+    color: var(--text-dark);
+    opacity:0.6;
+    margin-top: 10px;
+    min-height: 16px;
+  }
+
+  /* ---------- FINAL SCREEN ---------- */
+  .final-card{
+    background: var(--cream-card);
+    border-radius: 22px;
+    padding: 34px 26px;
+    text-align:center;
+    box-shadow: 0 16px 30px rgba(230,57,80,0.15);
+    position:relative;
+  }
+
+  .final-title{
+    font-family:'Caveat', cursive;
+    font-size: 2.1rem;
+    color: var(--red-heart-dark);
+    margin: 0 0 4px;
+  }
+
+  .final-sub{
+    font-size:0.85rem;
+    opacity:0.75;
+    margin: 0 0 22px;
+  }
+
+  .detail-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background: #fff0f5;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    text-align:left;
+  }
+
+  .detail-icon{
+    font-size:1.5rem;
+    flex-shrink:0;
+  }
+
+  .detail-label{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    opacity:0.6;
+    margin:0 0 2px;
+  }
+
+  .detail-value{
+    font-size:1rem;
+    font-weight:600;
+    margin:0;
+    color: var(--text-dark);
+  }
+
+  .ontime-note{
+    margin-top: 18px;
+    background: var(--gold);
+    color: #6b4700;
+    font-weight:600;
+    font-size:0.85rem;
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+
+  .closing{
+    margin-top: 22px;
+    font-family:'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--red-heart-dark);
+  }
+
+  @media (max-width: 380px){
+    .envelope{ width: 240px; height: 165px; }
+    .env-body::before, .env-body::after{ border-top-width: 82px; }
+    .env-body::before{ border-left-width: 120px; }
+    .env-body::after{ border-right-width: 120px; }
+    .env-flap{ border-left-width: 120px; border-right-width: 120px; border-top-width: 88px; }
+    .env-letter{ top: 34px; height: 100px; }
+    .heart-seal{ top: 66px; width: 56px; height:56px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<div class="stage">
+
+  <!-- SCREEN 1: ENVELOPE -->
+  <div class="screen active" id="screen-envelope">
+    <div class="envelope-wrap">
+      <h1 class="display-font">Ada surat buat kamu, Sayang 💌</h1>
+      <p class="sub">Ketuk amplopnya buat buka</p>
+
+      <div class="envelope" id="envelope" onclick="openEnvelope()">
+        <div class="env-body"></div>
+        <div class="env-letter"></div>
+        <div class="env-flap"></div>
+        <div class="heart-seal">
+          <svg viewBox="0 0 100 90">
+            <path d="M50 85 C10 55 0 30 20 12 C35 -2 50 8 50 24 C50 8 65 -2 80 12 C100 30 90 55 50 85 Z" fill="#e63950"/>
+          </svg>
+        </div>
+      </div>
+      <p class="tap-hint">👆 pencet love-nya ya</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: LETTER + QUESTION -->
+  <div class="screen" id="screen-letter">
+    <div class="card">
+      <p class="to-line display-font">Untuk Sayangg,</p>
+      <p class="message-text">just wanted to say thank u for being around. Kehadiranmu bener-bener bikin hariku jauh lebih berharga. Honestly u make everything a lot easier to handle. Makasih ya sayang udah selalu ada dan nemenin prosesku sejauh ini.
+
+Ngga perlu momen spesial sih buat bilang kalau aku bersyukur banget ketemu kamu. u really mean a lot to me. i appreciate every little thing u do for me. Stay as you are ya, because your existence makes my world so much better.
+
+Love you infinity, Sayangg 🩷</p>
+      <p class="from-line display-font">— Your Girlfriend</p>
+
+      <p class="question-title">Mau keluar dinner ngga? 🥺</p>
+
+      <div class="btn-row" id="btnRow">
+        <button class="btn btn-yes" onclick="goFinal()">Yes 🩷</button>
+        <button class="btn btn-no" id="noBtn">No</button>
+      </div>
+      <p class="no-hint" id="noHint">&nbsp;</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: FINAL DETAILS -->
+  <div class="screen" id="screen-final">
+    <div class="final-card">
+      <p class="final-title">Yeayy, akhirnya iya juga 🎉</p>
+      <p class="final-sub">udah tau kan jawabannya cuma satu 😌🩷</p>
+
+      <div class="detail-row">
+        <div class="detail-icon">📍</div>
+        <div>
+          <p class="detail-label">Tempat</p>
+          <p class="detail-value">[Nama Cafe — diisi Ana]</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-icon">📅</div>
+        <div>
+          <p class="detail-label">Tanggal</p>
+          <p class="detail-value">17 Juli 2026</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-icon">⏰</div>
+        <div>
+          <p class="detail-label">Jam</p>
+          <p class="detail-value">18.30 WIB</p>
+        </div>
+      </div>
+
+      <div class="ontime-note">⚠️ Harus ontime ya, ga terima alasan telat!! 😤🩷</div>
+
+      <p class="closing display-font">Sampai ketemu, Sayangg 🥰</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // floating hearts background
+  const heartsBg = document.getElementById('heartsBg');
+  const heartChars = ['💗','💕','🩷','💖'];
+  for(let i=0;i<16;i++){
+    const el = document.createElement('div');
+    el.className = 'heart-float';
+    el.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.fontSize = (14 + Math.random()*18) + 'px';
+    el.style.animationDuration = (8 + Math.random()*10) + 's';
+    el.style.animationDelay = (Math.random()*10) + 's';
+    heartsBg.appendChild(el);
+  }
+
+  function openEnvelope(){
+    const env = document.getElementById('envelope');
+    if(env.classList.contains('opened')) return;
+    env.classList.add('opened');
+    setTimeout(()=>{
+      document.getElementById('screen-envelope').classList.remove('active');
+      document.getElementById('screen-letter').classList.add('active');
+    }, 750);
+  }
+
+  function goFinal(){
+    document.getElementById('screen-letter').classList.remove('active');
+    document.getElementById('screen-final').classList.add('active');
+  }
+
+  // evasive "No" button
+  const noBtn = document.getElementById('noBtn');
+  const btnRow = document.getElementById('btnRow');
+  const noHint = document.getElementById('noHint');
+
+  const excuses = [
+    "eh ketangkep dikit lagi~",
+    "nope, coba lagi 😜",
+    "kamu yakin? coba pencet lagi deh",
+    "duh lincah banget aku ya",
+    "gabisa dipencet, takdirnya emang Yes 🩷",
+    "capek loh muter-muter mulu 😆"
+  ];
+  let hintIndex = 0;
+
+  function moveNoBtn(){
+    const rowRect = btnRow.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+    const maxLeft = rowRect.width - btnRect.width;
+    const maxTop = rowRect.height - btnRect.height;
+    const newLeft = Math.max(0, Math.random()*maxLeft);
+    const newTop = Math.max(0, Math.random()*maxTop);
+    noBtn.style.left = newLeft + 'px';
+    noBtn.style.top = newTop + 'px';
+    noHint.textContent = excuses[hintIndex % excuses.length];
+    hintIndex++;
+  }
+
+  // position initially inline next to Yes, then make it dodge
+  window.addEventListener('load', ()=>{
+    const rowRect = btnRow.getBoundingClientRect();
+    const yesBtn = document.querySelector('.btn-yes');
+    const yesRect = yesBtn.getBoundingClientRect();
+    noBtn.style.left = (yesRect.width + 18) + 'px';
+    noBtn.style.top = '0px';
+  });
+
+  noBtn.addEventListener('mouseover', moveNoBtn);
+  noBtn.addEventListener('click', (e)=>{ e.preventDefault(); moveNoBtn(); });
+  noBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); moveNoBtn(); }, {passive:false});
+  btnRow.addEventListener('mousemove', (e)=>{
+    const btnRect = noBtn.getBoundingClientRect();
+    const dx = e.clientX - (btnRect.left + btnRect.width/2);
+    const dy = e.clientY - (btnRect.top + btnRect.height/2);
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist < 70){ moveNoBtn(); }
+  });
+</script>
+
+</body>
+</html>
